@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <string.h>
 
 static mrb_value mrb_simple_tcp_client_connect(mrb_state *mrb, mrb_value self) {
   const char *host;
@@ -75,7 +76,7 @@ static mrb_value mrb_simple_tcp_client_write(mrb_state *mrb, mrb_value self) {
 
   mrb_get_args(mrb, "iz", &connection_file_descriptor, &message);
 
-  write(connection_file_descriptor, message, sizeof(message));
+  write(connection_file_descriptor, message, strlen((message)));
 
   return mrb_true_value();
 }

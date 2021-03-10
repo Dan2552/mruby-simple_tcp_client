@@ -29,7 +29,6 @@ module SimpleTCP
       end
     end
 
-    # TODO: fix longer messages e.g. "hello world\n" doesn't work
     def write(message)
       Internal.write(@connection_id, message)
     end

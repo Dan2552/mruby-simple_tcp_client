@@ -18,6 +18,10 @@ module SimpleTCP
       true
     end
 
+    def connected?
+      !!@connection_id
+    end
+
     def disconnect
       return true unless @connection_id
 

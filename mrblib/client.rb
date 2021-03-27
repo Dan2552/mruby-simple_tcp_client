@@ -14,11 +14,11 @@ module SimpleTCP
       # TODO: convert hostname to ip
       @connection_id = Internal.connect(host, port)
 
+      raise FailedToConnectError unless @connection_id
+
       unless @blocking
         Internal.disable_blocking(@connection_id)
       end
-
-      raise FailedToConnectError unless @connection_id
 
       true
     end

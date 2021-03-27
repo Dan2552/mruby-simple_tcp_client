@@ -30,8 +30,6 @@ static mrb_value mrb_simple_tcp_client_connect(mrb_state *mrb, mrb_value self) {
     return mrb_false_value();
   }
 
-  fprintf(stdout, "CONNECTING: address=%s port=%d\n", host, port);
-
   // Create the local socket
   connection_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (connection_file_descriptor == -1) {

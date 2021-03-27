@@ -1,11 +1,16 @@
 module SimpleTCP
+  class AlreadyConnectedError < StandardError; end
+  class FailedToConnectError < StandardError; end
+  class FailedToDisconnectError < StandardError; end
+  class UnexpectedReadError < StandardError; end
+
   class Client
     def initialize(blocking: true)
       @blocking = !!blocking
     end
 
     def connect(host, port)
-      raise "Already connected" if @connection_id
+      raise AlreadyConnectedError if @connection_id
       # TODO: convert hostname to ip
       @connection_id = Internal.connect(host, port)
 
@@ -13,7 +18,7 @@ module SimpleTCP
         Internal.disable_blocking(@connection_id)
       end
 
-      raise "Failed to connect" unless @connection_id
+      raise FailedToConnectError unless @connection_id
 
       true
     end
@@ -29,7 +34,7 @@ module SimpleTCP
         @connection_id = nil
         true
       else
-        raise "Disconnecting failed"
+        raise FailedToDisconnectError
       end
     end
 
@@ -45,7 +50,7 @@ module SimpleTCP
           Internal.non_blocking_read(@connection_id)
         end
 
-      raise "Unexpected read error" if result == false
+      raise UnexpectedReadError if result == false
 
       result
     end

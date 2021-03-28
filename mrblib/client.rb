@@ -3,16 +3,22 @@ module SimpleTCP
   class FailedToConnectError < StandardError; end
   class FailedToDisconnectError < StandardError; end
   class UnexpectedReadError < StandardError; end
+  class UnexpectedWriteError < StandardError; end
+  class DisconnectedError < StandardError; end
+  class ReadWhenDisconnectedError < DisconnectedError; end
+  class WriteWhenDisconnectedError < DisconnectedError; end
 
   class Client
-    def initialize(blocking: true)
+    def initialize(blocking: true, verbose: false)
       @blocking = !!blocking
+      @verbose = verbose ? 1 : 0
     end
 
     def connect(host, port)
       raise AlreadyConnectedError if @connection_id
+
       # TODO: convert hostname to ip
-      @connection_id = Internal.connect(host, port)
+      @connection_id = Internal.connect(host, port, @verbose)
 
       raise FailedToConnectError unless @connection_id
 
@@ -27,22 +33,36 @@ module SimpleTCP
       !!@connection_id
     end
 
-    def disconnect
+    def disconnect(error_on_failure = true)
       return true unless @connection_id
 
-      if Internal.disconnect(@connection_id)
-        @connection_id = nil
+      if Internal.disconnect(@connection_id, @verbose)
         true
-      else
+      elsif error_on_failure
         raise FailedToDisconnectError
+      else
+        false
       end
+    ensure
+      @connection_id = nil
     end
 
     def write(message)
-      Internal.write(@connection_id, message)
+      raise WriteWhenDisconnectedError unless connected?
+
+      result = Internal.write(@connection_id, message, @verbose)
+
+      if result == false
+        disconnect(false)
+        raise UnexpectedWriteError
+      end
+
+      result
     end
 
     def read
+      raise ReadWhenDisconnectedError unless connected?
+
       result =
         if @blocking
           Internal.blocking_read(@connection_id)
@@ -50,7 +70,10 @@ module SimpleTCP
           Internal.non_blocking_read(@connection_id)
         end
 
-      raise UnexpectedReadError if result == false
+      if result == false
+        disconnect(false)
+        raise UnexpectedReadError
+      end
 
       result
     end

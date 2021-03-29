@@ -88,7 +88,7 @@ static mrb_value mrb_simple_tcp_client_write(mrb_state *mrb, mrb_value self) {
   mrb_get_args(mrb, "izi", &connection_file_descriptor, &message, &verbose);
 
   int is_success;
-  is_success = write(connection_file_descriptor, message, strlen((message)));
+  is_success = send(connection_file_descriptor, message, strlen(message), MSG_NOSIGNAL);
 
   if (is_success == -1) {
     if (verbose) {

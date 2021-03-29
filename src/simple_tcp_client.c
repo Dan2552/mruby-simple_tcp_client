@@ -100,16 +100,7 @@ static mrb_value mrb_simple_tcp_client_write(mrb_state *mrb, mrb_value self) {
   return mrb_true_value();
 }
 
-static mrb_value mrb_simple_tcp_client_blocking_read(mrb_state *mrb, mrb_value self) {
-  mrb_int connection_file_descriptor;
-  mrb_get_args(mrb, "i", &connection_file_descriptor);
-
-  char buffer[255];
-  read(connection_file_descriptor, buffer, 255);
-  return mrb_str_new_cstr(mrb, buffer);
-}
-
-static mrb_value mrb_simple_tcp_client_non_blocking_read(mrb_state *mrb, mrb_value self) {
+static mrb_value mrb_simple_tcp_client_read(mrb_state *mrb, mrb_value self) {
   mrb_int connection_file_descriptor;
 
   mrb_get_args(mrb, "i", &connection_file_descriptor);
@@ -146,8 +137,7 @@ void mrb_mruby_simple_tcp_client_gem_init(mrb_state *mrb) {
   mrb_define_class_method(mrb, internal, "connect", mrb_simple_tcp_client_connect, MRB_ARGS_REQ(3));
   mrb_define_class_method(mrb, internal, "disconnect", mrb_simple_tcp_client_disconnect, MRB_ARGS_REQ(2));
   mrb_define_class_method(mrb, internal, "write", mrb_simple_tcp_client_write, MRB_ARGS_REQ(3));
-  mrb_define_class_method(mrb, internal, "blocking_read", mrb_simple_tcp_client_blocking_read, MRB_ARGS_REQ(1));
-  mrb_define_class_method(mrb, internal, "non_blocking_read", mrb_simple_tcp_client_non_blocking_read, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, internal, "read", mrb_simple_tcp_client_read, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, internal, "disable_blocking", mrb_simple_tcp_client_set_non_blocking, MRB_ARGS_REQ(1));
 }
 

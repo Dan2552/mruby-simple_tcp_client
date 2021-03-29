@@ -63,12 +63,7 @@ module SimpleTCP
     def read
       raise ReadWhenDisconnectedError unless connected?
 
-      result =
-        if @blocking
-          Internal.blocking_read(@connection_id)
-        else
-          Internal.non_blocking_read(@connection_id)
-        end
+      result = Internal.read(@connection_id)
 
       if result == false
         disconnect(false)

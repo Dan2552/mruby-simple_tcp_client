@@ -8,6 +8,69 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <netdb.h>
+
+
+int lookup_host(const char *host, char *ip_address) {
+  struct addrinfo hints;
+  struct addrinfo *res;
+  struct addrinfo *result;
+  int errcode;
+  void *ptr;
+
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = PF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags |= AI_CANONNAME;
+
+  printf("getting addrinfo");
+  errcode = getaddrinfo(host, NULL, &hints, &result);
+  if (errcode != 0) {
+    perror("getaddrinfo");
+    return -1;
+  }
+
+  printf("got address");
+  res = result;
+
+  while(res) {
+    printf("inetting");
+    inet_ntop(res->ai_family, res->ai_addr->sa_data, ip_address, 100);
+
+    switch(res->ai_family) {
+    case AF_INET:
+      printf("got ipv4");
+      ptr = &((struct sockaddr_in *) res->ai_addr)->sin_addr;
+      break;
+    }
+    printf("second innetting");
+    inet_ntop(res->ai_family, ptr, ip_address, 100);
+
+    res = res->ai_next;
+  }
+
+  printf("freeeing mem");
+  freeaddrinfo(result);
+
+  return 0;
+}
+
+static mrb_value mrb_simple_tcp_client_resolve_host(mrb_state *mrb, mrb_value self) {
+  printf("commencing");
+  int result;
+  const char *ip_address;
+  const char *host;
+
+  mrb_get_args(mrb, "z", &host);
+
+  printf("resolving host");
+  result = lookup_host(host, ip_address);
+  if (result != 0) {
+    fprintf(stderr, "Host Resolution Error");
+  }
+
+  return mrb_str_new_cstr(mrb, ip_address);
+}
 
 static mrb_value mrb_simple_tcp_client_connect(mrb_state *mrb, mrb_value self) {
   const char *host;
@@ -134,6 +197,7 @@ void mrb_mruby_simple_tcp_client_gem_init(mrb_state *mrb) {
   struct RClass *lib_module = mrb_define_module(mrb, "SimpleTCP");
   struct RClass *internal = mrb_define_module_under(mrb, lib_module, "Internal");
 
+  mrb_define_class_method(mrb, internal, "resolve_host", mrb_simple_tcp_client_resolve_host, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, internal, "connect", mrb_simple_tcp_client_connect, MRB_ARGS_REQ(3));
   mrb_define_class_method(mrb, internal, "disconnect", mrb_simple_tcp_client_disconnect, MRB_ARGS_REQ(2));
   mrb_define_class_method(mrb, internal, "write", mrb_simple_tcp_client_write, MRB_ARGS_REQ(3));

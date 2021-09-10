@@ -1,0 +1,5 @@
+mruby tag: "3.0.0"
+
+gembox "default"
+gem "simple_tcp_client", path: "."
+gem "mruby-irb_like_debugger", github: "Dan2552/mruby-irb_like_debugger"

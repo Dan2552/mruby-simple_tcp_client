@@ -1,0 +1,9 @@
+# https://github.com/mruby/mruby 3.0.0
+
+MRuby::Build.new do |conf|
+  toolchain :clang
+
+  conf.gembox "default"
+  conf.gem :github => "Dan2552/mruby-irb_like_debugger"
+  conf.gem :path => "/Users/bryn.bayliss/Soho/mruby-simple_tcp_client"
+end

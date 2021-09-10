@@ -1,0 +1,23 @@
+GIT
+  remote: https://github.com/Dan2552/mundler
+  revision: 1316ec2c9545408b51e67b7c95d261c587a2787c
+  tag: 0.7.0
+  specs:
+    mundler (0.7.0)
+      rake
+      thor
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (13.0.6)
+    thor (1.1.0)
+
+PLATFORMS
+  universal-darwin-20
+
+DEPENDENCIES
+  mundler!
+
+BUNDLED WITH
+   2.2.20

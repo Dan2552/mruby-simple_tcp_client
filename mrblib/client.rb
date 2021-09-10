@@ -1,3 +1,4 @@
+
 module SimpleTCP
   class AlreadyConnectedError < StandardError; end
   class FailedToConnectError < StandardError; end
@@ -17,7 +18,9 @@ module SimpleTCP
     def connect(host, port)
       raise AlreadyConnectedError if @connection_id
 
-      # TODO: convert hostname to ip
+      if host[0].to_i > 0
+        host = Internal.resolve_host(host)
+      end
       @connection_id = Internal.connect(host, port, @verbose)
 
       raise FailedToConnectError unless @connection_id
